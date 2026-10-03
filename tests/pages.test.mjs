@@ -2,7 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import vm from 'node:vm';
 import fs from 'node:fs';
-import {parseHTML} from 'linkedom';
+import {DOMParser,parseHTML} from 'linkedom';
 const {window,document}=parseHTML(fs.readFileSync('web/index.html','utf8'));
 Object.defineProperty(document,'baseURI',{value:'https://daytondeltap.github.io/flood-aid/'});
 const storage=new Map(),requests=[];
@@ -11,8 +11,8 @@ const responseFor=url=>String(url).includes('/data/inventory.json')?{rows:[],pro
 const dialog=document.querySelector('dialog');dialog.showModal=function(){this.open=true};dialog.close=function(){this.open=false};window.scrollTo=()=>{};window.HTMLElement.prototype.scrollIntoView=()=>{};
 const fetcher=async(url,opts)=>{requests.push({url,opts});return Response.json(responseFor(url))};
 class FormDataStub{constructor(form){this.items=[...form.querySelectorAll('[name]')].map(e=>[e.name||e.getAttribute('name'),e.value??''])}get(k){return this.items.find(x=>x[0]===k)?.[1]}[Symbol.iterator](){return this.items[Symbol.iterator]()}}
-const sandbox={window,document,console,sessionStorage:{getItem:k=>storage.get(k)||null,setItem:(k,v)=>storage.set(k,v),removeItem:k=>storage.delete(k)},URLSearchParams,clearTimeout:()=>{},navigator:{onLine:true},localStorage:{getItem:k=>storage.get(k)||null,setItem:(k,v)=>storage.set(k,v)},setInterval:()=>0,setTimeout:()=>0,URL,Response,Request,AbortSignal,AbortController,Date,Math,JSON,Map,Set,Promise,Number,String,encodeURIComponent,fetch:fetcher,FormData:FormDataStub};
-vm.createContext(sandbox);for(const file of ['config.js','core.js','app.js','upgrade.js','pages.js','inventory-core.js','inventory.js','google-map.js'])vm.runInContext(fs.readFileSync('web/'+file,'utf8'),sandbox,{filename:file});
+const sandbox={window,document,console,DOMParser,sessionStorage:{getItem:k=>storage.get(k)||null,setItem:(k,v)=>storage.set(k,v),removeItem:k=>storage.delete(k)},URLSearchParams,clearTimeout:()=>{},navigator:{onLine:true},localStorage:{getItem:k=>storage.get(k)||null,setItem:(k,v)=>storage.set(k,v)},setInterval:()=>0,setTimeout:()=>0,URL,Response,Request,AbortSignal,AbortController,Date,Math,JSON,Map,Set,Promise,Number,String,encodeURIComponent,fetch:fetcher,FormData:FormDataStub};
+vm.createContext(sandbox);for(const file of ['config.js','core.js','app.js','upgrade.js','pages.js','inventory-core.js','inventory.js','stock-metadata.js','metadata-ui.js','google-map.js'])vm.runInContext(fs.readFileSync('web/'+file,'utf8'),sandbox,{filename:file});
 const run=source=>vm.runInContext(source,sandbox);
 
 
@@ -38,3 +38,7 @@ test('Google overlay renders canvas and cm labels at historical time and cleans 
  run('drawFlood()');assert.equal(panes.overlayMouseTarget.querySelectorAll('button').length,labelCount);run("heatOn=false;drawFlood()");const painted=paint.length;run('drawFlood()');assert.equal(paint.length,painted);run('window.GMAPReady=false;render()');assert.equal(panes.overlayMouseTarget.children.length,0);
  document.createElement=originalCreate;delete sandbox.google;delete window.google;
 });
+
+test('sensor list opens evidence without moving the map camera',()=>{let moves=0;sandbox.testMap={getCenter:()=>({lat:13.81,lng:100.73}),getZoom:()=>14,remove(){},flyTo(){moves++}};run("floodData.rows=[{id:'click',name:'Click road',lat:area().lat,lng:area().lng,depth:20,observedAt:Date.now()-86400000}];historyAt=null;navigate('map');map=testMap");const row=document.querySelector('[data-sensor]');row.onclick();assert.equal(moves,0);assert.equal(dialog.open,true);dialog.close();run('map=null');delete sandbox.testMap});
+test('old heat is explicit and does not change sensor freshness',()=>{run("navigate('map');historyAt=null;heatOn=true;render()");const toggle=document.querySelector('#oldHeatToggle');assert.equal(toggle.hasAttribute('checked'),false);toggle.checked=true;toggle.onchange({target:toggle});assert.equal(run('showOldHeat'),true);assert.match(document.querySelector('#heatStatus').textContent,/dated readings/);assert.match(document.querySelector('.sensor-value').className,/stale/);run('showOldHeat=false')});
+test('metadata saved-page UI reads offers and keeps online claims separate',()=>{run("navigate('supplies')");document.querySelector('#metadataHTML').value='<script type="application/ld+json">{"@type":"Product","name":"Test rice","offers":{"@type":"Offer","availability":"https://schema.org/InStock"}}</script>';document.querySelector('#metadataHTML').oninput({target:document.querySelector('#metadataHTML')});document.querySelector('#metadataRead').onclick();assert.match(document.querySelector('#metadataResults').textContent,/Test rice/);assert.match(document.querySelector('#metadataResults').textContent,/Quantity not published/);assert.match(document.querySelector('#metadataResults').textContent,/does not establish stock/)});

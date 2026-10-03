@@ -72,3 +72,13 @@ Google Maps uses direct drag/zoom, keyboard shortcuts and fullscreen controls. S
 History shows an exact Bangkok date/time and date/time picker, with a slider spanning recorded measurements. The map and sensor list share the selected historical time. Snapshots accumulate up to 30 days of readings as they are collected; missing past measurements cannot be reconstructed. The available range can include older current-source records. District changes clear the old journey/history state.
 
 The repository root also contains an app entry point for legacy branch-based Pages publishing. The Actions app workflow runs again after the built-in Pages workflow completes, ensuring the generated app and refreshed data are the final publication. Choosing GitHub Actions in Pages settings avoids the redundant legacy build entirely.
+
+### Product-page stock evidence
+
+Nearby supplies → Check a product page reads retailer-published Schema.org Product/Offer JSON-LD, scoped microdata, and product availability meta tags. Enter an HTTPS product URL; retailers that do not allow cross-origin reading require a saved HTML file or pasted page source. Files are parsed locally and scripts are not executed. No paid service or backend is required.
+
+Only `inventoryLevel.value` supplies a quantity. `offerCount`, prices, listing presence and generic “in stock” page text never supply counts. An offer gets a branch/distance only if its own `availableAtOrFrom` identifies a named place with coordinates. Other offers stay labelled online listings. Expired offers become unknown. Checks show the inspection time; metadata has no live stock guarantee. This method does not access private retailer inventory APIs.
+
+### Map evidence display
+
+Depth labels remain geographically anchored while pressed, and sensor list selection opens evidence without panning or zooming. Google Maps waits for the maps library before creating overlays and falls back to OpenStreetMap with a visible diagnosis on initialization/authentication failures. Depth heat uses yellow/orange/red gradients on both engines. The optional “Color old recorded depths” control displays dated measurements while keeping stale nodes and their timestamps explicit; it never updates their freshness or route assessment.

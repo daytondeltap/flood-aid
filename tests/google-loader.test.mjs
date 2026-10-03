@@ -1,0 +1,8 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import fs from 'node:fs';
+import vm from 'node:vm';
+import {parseHTML} from 'linkedom';
+function loader(sdk){const {document}=parseHTML('<html><head></head><body><dialog id="detail"></dialog><p id="keyError"></p></body></html>');const timers=[];const sandbox={window:{google:sdk},document,URLSearchParams,setTimeout:f=>{timers.push(f);return 1},clearTimeout(){},$:s=>document.querySelector(s),t:a=>a,toast(){},render(){}};vm.createContext(sandbox);const code=fs.readFileSync('web/google-map.js','utf8').split('const leafletInit=')[0];vm.runInContext(code,sandbox);return {sandbox,document,timers,enable:key=>vm.runInContext(`enableGoogleMap(${JSON.stringify(key)})`,sandbox)}}
+test('Google SDK waits for maps library before enabling overlays',async()=>{let finish;const {sandbox,enable}=loader({maps:{Map:class{},OverlayView:class{},importLibrary:()=>new Promise(r=>finish=r)}});const p=enable('test-browser-key-123456789');const callback=sandbox.window.faGoogleReady();assert.equal(sandbox.window.GMAPReady,false);finish({});await callback;await p;assert.equal(sandbox.window.GMAPReady,true)});
+test('Google authorization failure keeps usable fallback and visible diagnosis',async()=>{const {sandbox,document,enable}=loader({maps:{}});const p=enable('test-browser-key-123456789');sandbox.window.gm_authFailure();await assert.rejects(p,/authorization failed/);assert.equal(sandbox.window.GMAPReady,false);assert.match(document.querySelector('#keyError').textContent,/Google rejected this key/);assert.equal(document.querySelector('#googleMapsScript'),null)});
