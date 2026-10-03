@@ -29,6 +29,8 @@ jobs:
         with:
           python-version: '3.12'
       - run: npm ci
+      - name: Preserve initial retailer listings
+        run: cp web/data/retailer-stock.json /tmp/floodaid-retailer-seed.json
       - name: Restore recent public observations
         uses: actions/cache/restore@v4
         with:
@@ -43,6 +45,8 @@ jobs:
           INVENTORY_PROVIDERS_JSON: ${{ secrets.INVENTORY_PROVIDERS_JSON }}
       - name: Read public retailer product pages
         run: node scripts/refresh-retailer-stock.mjs
+        env:
+          RETAILER_SEED_FILE: /tmp/floodaid-retailer-seed.json
       - name: Verify application logic
         run: npm test
       - name: Build Pages
