@@ -1,5 +1,19 @@
 'use strict';
 window.InventoryCore={
+ category(row){const n=`${row.productName||''} ${row.productNameTh||''}`.toLowerCase();
+  for(const [id,pattern] of [
+   ['power',/batter(?:y|ies)|torchlight|flashlight|ถ่าน(?:ไฟฉาย)?|ไฟฉาย/],
+   ['sanitary',/sanitary|tampon|ผ้าอนามัย/],
+   ['baby',/diaper|napp(?:y|ies)|baby.*(?:wipe|milk|formula)|ผ้าอ้อม|นมผงเด็ก|นมผงทารก|ทิชชู่เปียกเด็ก/],
+   ['care',/bandage|gauze|medical mask|face mask|cotton (?:ball|pad)|antiseptic|พลาสเตอร์|หน้ากาก|สำลี|ผ้าก๊อซ/],
+   ['hygiene',/tissue|toilet paper|wipe|soap|toothpaste|toothbrush|sanitizer|ทิชชู่|กระดาษชำระ|สบู่|ยาสีฟัน|แปรงสีฟัน|เจลล้างมือ/],
+   ['cleaning',/detergent|disinfectant|garbage bag|trash bag|dish ?wash|ผงซักฟอก|น้ำยาซัก|น้ำยาล้างจาน|ถุงขยะ/],
+   ['water',/drinking water|mineral water|น้ำดื่ม|น้ำแร่/],
+   ['food',/rice|noodle|cereal|canned|tuna|sardine|ข้าว|บะหมี่|ปลากระป๋อง/]
+  ])if(pattern.test(n))return id;
+  return 'other';
+ },
+ preview(rows,limit=12){const branches=rows.filter(r=>r.scope==='branch');const groups=new Map();for(const r of rows.filter(r=>r.scope!=='branch')){const key=this.category(r);if(!groups.has(key))groups.set(key,[]);groups.get(key).push(r)}const result=branches.slice(0,limit);while(result.length<limit&&groups.size){for(const [key,group] of groups){result.push(group.shift());if(!group.length)groups.delete(key);if(result.length===limit)break}}return result},
  fresh(row,now=Date.now()){return Number.isFinite(row.observedAt)&&row.observedAt<=now+60000&&now-row.observedAt<=15*60000},
  safeURL(value){try{const u=new URL(value);return u.protocol==='https:'&&!u.username&&!u.password?u.href:''}catch{return ''}},
  nearby(rows,origin,radius,provider,search,now=Date.now()){
