@@ -11,7 +11,7 @@ The workflow builds and deploys on pushes to `main`, manual runs, and an hourly 
 
 ## Google Maps key
 
-The app works with OpenStreetMap by default. Open **Map settings** in the top bar to enter your Google Maps browser key. It is stored only in that tab's session. Enable **Maps JavaScript API** and billing, and restrict the key to **https://daytondeltap.github.io/*** and **Maps JavaScript API**.
+The app works with OpenStreetMap by default. Open **Map settings** in the top bar to enter your Google Maps browser key. You can keep it for the tab or choose to remember it on the device. Enable **Maps JavaScript API** and billing, and restrict the key to **https://daytondeltap.github.io/*** and **Maps JavaScript API**.
 
 For a site-wide key, add the repository Actions secret `GOOGLE_MAPS_BROWSER_KEY`, then run the workflow. The build injects it into public browser configuration: browser API keys are visible to visitors even when supplied via a build secret. Use website and API restrictions; never use a server-only secret. The key changes the basemap only. It does not supply flood depths, stock availability or routing data.
 
@@ -70,3 +70,5 @@ Map settings accepts a single Maps JavaScript browser key for all map views, wit
 Google Maps uses direct drag/zoom, keyboard shortcuts and fullscreen controls. Sensor overlays use a viewport-sized, pixel-density-aware canvas and clickable centimetre labels; they do not rely on Google's retired HeatmapLayer API. No current wet measurements means no current heat layer. The map explains this and offers the latest recorded time. Historical readings must never be presented as current flooding.
 
 History shows an exact Bangkok date/time and date/time picker, with a slider spanning recorded measurements. The map and sensor list share the selected historical time. Snapshots accumulate up to 30 days of readings as they are collected; missing past measurements cannot be reconstructed. The available range can include older current-source records. District changes clear the old journey/history state.
+
+The repository root also contains an app entry point for legacy branch-based Pages publishing. The Actions app workflow runs again after the built-in Pages workflow completes, ensuring the generated app and refreshed data are the final publication. Choosing GitHub Actions in Pages settings avoids the redundant legacy build entirely.
