@@ -73,12 +73,12 @@ History shows an exact Bangkok date/time and date/time picker, with a slider spa
 
 The repository root also contains an app entry point for legacy branch-based Pages publishing. The Actions app workflow runs again after the built-in Pages workflow completes, ensuring the generated app and refreshed data are the final publication. Choosing GitHub Actions in Pages settings avoids the redundant legacy build entirely.
 
-### Product-page stock evidence
+### Automatic retailer stock reading
 
-Nearby supplies → Check a product page reads retailer-published Schema.org Product/Offer JSON-LD, scoped microdata, and product availability meta tags. Enter an HTTPS product URL; retailers that do not allow cross-origin reading require a saved HTML file or pasted page source. Files are parsed locally and scripts are not executed. No paid service or backend is required.
+Nearby supplies has one item search, retailer selector (Makro, 7-Eleven, Big C) and optional location button. Users do not enter URLs, save HTML, configure feeds or open retailer menus.
 
-Only `inventoryLevel.value` supplies a quantity. `offerCount`, prices, listing presence and generic “in stock” page text never supply counts. An offer gets a branch/distance only if its own `availableAtOrFrom` identifies a named place with coordinates. Other offers stay labelled online listings. Expired offers become unknown. Checks show the inspection time; metadata has no live stock guarantee. This method does not access private retailer inventory APIs.
+The scheduled Pages update reads public retailer pages with a Node collector (`scripts/refresh-retailer-stock.mjs`). It extracts SKU-matched stock flags from Makro Next.js data and Big C streamed page data, plus Schema.org offers where present. Current seed pages cover drinking water, Makro rice/cereal and Big C instant noodles. A failed or blocked source stays unknown; no access controls are bypassed. Only public product fields enter `web/data/retailer-stock.json`.
 
-### Map evidence display
+`inStock` and `stock: Y/N` provide listing availability, never exact quantities. Pack size, `inventoryQuantity` flags, safety-stock settings, purchase limits and offer counts are not remaining inventory. Online availability remains labelled online; branch distances/routes require an explicit branch with coordinates. The hourly snapshot has a two-hour display freshness limit and retains original check times after failures. Approved branch feeds remain supported separately.
 
-Depth labels remain geographically anchored while pressed, and sensor list selection opens evidence without panning or zooming. Google Maps waits for the maps library before creating overlays and falls back to OpenStreetMap with a visible diagnosis on initialization/authentication failures. Depth heat uses yellow/orange/red gradients on both engines. The optional “Color old recorded depths” control displays dated measurements while keeping stale nodes and their timestamps explicit; it never updates their freshness or route assessment.
+The compact interface removes manual metadata tools, repeated explainers, disconnected report/watch/save widgets and redundant cards. It retains timestamps, historical map controls, essential unknown/stale labels, route evidence, language/theme settings and assistance calls.

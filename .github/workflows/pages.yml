@@ -41,6 +41,8 @@ jobs:
         run: python scripts/refresh-inventory.py
         env:
           INVENTORY_PROVIDERS_JSON: ${{ secrets.INVENTORY_PROVIDERS_JSON }}
+      - name: Read public retailer product pages
+        run: node scripts/refresh-retailer-stock.mjs
       - name: Verify application logic
         run: npm test
       - name: Build Pages

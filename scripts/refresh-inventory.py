@@ -2,7 +2,7 @@
 import json, os, time, math, urllib.request, urllib.parse
 from pathlib import Path
 OUT = Path('web/data/inventory.json')
-PROVIDERS = [('7-eleven', '7-Eleven'), ('makro', 'Makro'), ('restaurants', 'Restaurant chains')]
+PROVIDERS = [('7-eleven', '7-Eleven'), ('makro', 'Makro'), ('bigc', 'Big C'), ('restaurants', 'Restaurant chains')]
 def normalize(row, provider, now):
  if not isinstance(row, dict): return None
  lat, lng = row.get('lat'), row.get('lng')
