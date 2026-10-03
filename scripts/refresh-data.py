@@ -37,7 +37,7 @@ def flood():
     rows.append({'id':str(s.get('floodroad_oldcode') or s['id']),'name':s.get('floodroad_name',{}).get('th',str(s['id'])),'lat':lat,'lng':lng,'depth':depth,'observedAt':at,'district':r.get('geocode',{}).get('amphoe_name',{}).get('th',''),'source':'BMA via ThaiWater','url':'https://www.thaiwater.net/'})
    except (ValueError,KeyError,TypeError):continue
   if not rows:raise ValueError('No valid readings')
-  history={(r['id'],r['observedAt']):r for r in previous.get('history',[])+previous.get('rows',[])+rows if r['observedAt']>=time.time()*1000-48*3600000}
+  history={(r['id'],r['observedAt']):r for r in previous.get('history',[])+previous.get('rows',[])+rows if r['observedAt']>=time.time()*1000-30*24*3600000}
   write(p,{'rows':rows,'history':list(history.values()),'retrievedAt':int(time.time()*1000),'sourceUrl':'https://api-v3.thaiwater.net/api/v1/thaiwater30/public/flood_road'});return f'flood: {len(rows)} readings'
  except Exception:
   if not previous:write(p,{'rows':[],'history':[],'retrievedAt':None,'error':'Flood source unavailable'})
