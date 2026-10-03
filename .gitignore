@@ -1,0 +1,8 @@
+node_modules/
+dist/
+worker-dist/
+.env
+.env.*
+!.env.example
+.sites-runtime/
+.openai/
