@@ -33,6 +33,10 @@ jobs:
           restore-keys: floodaid-observations-
       - name: Refresh public source data
         run: npm run data:refresh
+      - name: Refresh connected retailer inventory
+        run: python scripts/refresh-inventory.py
+        env:
+          INVENTORY_PROVIDERS_JSON: ${{ secrets.INVENTORY_PROVIDERS_JSON }}
       - name: Verify application logic
         run: npm test
       - name: Build Pages

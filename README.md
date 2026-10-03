@@ -46,3 +46,19 @@ python -m http.server 8080 --directory dist
 - Optional Google Maps basemap retains Google attribution. See the app's Privacy & terms page for external-provider details.
 
 Public readings and directory snapshots in `web/data/` contain no private-site user records. The original hosted app is not removed by this migration.
+
+## Retailer inventory routing
+
+The Supplies view now has a separate retailer-stock panel with product/branch search, retailer filters, distance radius, optional device location, source observation times and quantities when provided. GPS stays in the browser. Inventory coordinates come from each feed, not guessed matches to directory names. A null quantity means the provider did not supply a count; zero means unavailable. Readings over 15 minutes old and failed sources do not establish current stock.
+
+No 7-Eleven Thailand, Makro Thailand or restaurant inventory feed is connected by default. No documented public branch-inventory API was verified for those retailers. A Google Maps or Firebase key cannot grant retailer inventory access. Official retailer links let visitors check directly while access is being arranged. 7Delivery and ALL Online listings are not interchangeable with local store stock. Delivery-platform partner APIs require merchant credentials and cover authorized branches.
+
+To connect an approved retailer API or adapter, add the GitHub Actions secret `INVENTORY_PROVIDERS_JSON`. Its keys are `7-eleven`, `makro`, and `restaurants`; each value contains `url` (HTTPS JSON endpoint) and optionally `bearerToken`. The scheduled workflow routes each provider separately. Only normalized public inventory is published; endpoint configuration and tokens stay in Actions. Connect only feeds whose stock information is intended for public display. This is an adapter contract, not a claim that retailers use this endpoint format. A native retailer response must be converted by its approved adapter to this schema:
+
+```json
+{"rows":[{"branchId":"retailer-branch-id","branchName":"Branch name","lat":13.812,"lng":100.731,"productId":"sku","productName":"Drinking water","quantity":null,"unit":"bottles","status":"unknown","observedAt":1791021000000,"url":"https://retailer.example/product"}]}
+```
+
+`observedAt` is the retailer's observation timestamp in Unix milliseconds, not the adapter download time. `status` accepts `available`, `limited`, `unavailable`, `unknown`. `quantity` must be a nonnegative number or null. Branch and product IDs/names are required. Records are limited to Bangkok and nearby coordinates. Invalid records are discarded. Provider failures retain earlier readings but mark the source unavailable. Removed connections remove their readings. No customer/account/order data belongs in a feed. Snapshot refresh is hourly, subject to GitHub scheduling delays; the refresh button reloads the last publication rather than contacting protected retailer APIs. Firebase is not required for this read-only snapshot integration.
+
+Research: [CP ALL 7Delivery / ALL Online](https://www.cpall.co.th/en/sustain/social-dimension/customer-relationship-management), [Foodpanda partner catalog documentation](https://developer.foodpanda.com/en/documentation/catalog-api-use-cases). Neither supplies unrestricted access to other merchants' stock.
