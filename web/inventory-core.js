@@ -1,6 +1,7 @@
 'use strict';
 window.InventoryCore={
- category(row){const n=`${row.productName||''} ${row.productNameTh||''}`.toLowerCase();
+ productURL(row){const hosts={'7-eleven':['www.allonline.7eleven.co.th','allonline.7eleven.co.th'],makro:['www.makro.pro'],bigc:['www.bigc.co.th'],kfc:['www.kfc.co.th'],mcdonalds:['www.mcdonalds.co.th']};try{const u=new URL(this.safeURL(row.url));return hosts[row.provider]?.includes(u.hostname)?u.href:''}catch{return ''}},
+ category(row){if(row.menuListing)return 'meals:'+row.provider;const n=`${row.productName||''} ${row.productNameTh||''}`.toLowerCase();
   for(const [id,pattern] of [
    ['power',/batter(?:y|ies)|torchlight|flashlight|ถ่าน(?:ไฟฉาย)?|ไฟฉาย/],
    ['sanitary',/sanitary|tampon|ผ้าอนามัย/],

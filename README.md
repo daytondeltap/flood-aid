@@ -84,3 +84,5 @@ The scheduled Pages update reads public retailer pages with a Node collector (`s
 The compact interface removes manual metadata tools, repeated explainers, disconnected report/watch/save widgets and redundant cards. It retains timestamps, historical map controls, essential unknown/stale labels, route evidence, language/theme settings and assistance calls.
 
 Stock previews rotate across water, food, hygiene, sanitary products, diapers, batteries, masks and cleaning supplies. The public reader checks essential categories on retailer pages; a mixed 12-item preview keeps one category from hiding the others. Search still finds individual products. Availability and exact branch counts retain the same evidence requirements.
+
+Stock cards open a confirmation dialog before navigating to the official product page. KFC and McDonald's menus are read automatically; menu listings do not establish local branch inventory or delivery availability. McDonald's uses its published product ordering links; KFC uses its menu with the item anchor because product cards share the menu URL.
