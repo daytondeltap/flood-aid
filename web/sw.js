@@ -1,4 +1,4 @@
-const CACHE='floodaid-pages-v5';
+const CACHE='floodaid-pages-v6';
 const scope=new URL(self.registration.scope);
 const FILES=['','index.html','app.js','upgrade.js','pages.js','google-map.js','config.js','inventory-core.js','inventory.js','core.js','style.css','leaflet.js','leaflet.css','leaflet-heat.js','privacy.html'];
 const urls=FILES.map(p=>new URL(p,scope).href);

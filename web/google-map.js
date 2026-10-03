@@ -19,4 +19,5 @@ drawRoutes=function(){if(!map?.google)return leafletRoutes();gRouteLayers=clearG
 const mapAction=action;action=function(a){if(a==='locate'&&map?.google){if(!navigator.geolocation)return;navigator.geolocation.getCurrentPosition(p=>{map?.flyTo([p.coords.latitude,p.coords.longitude],15)},()=>toast(t('Location unavailable. Select a district instead.','ไม่สามารถหาตำแหน่งได้ โปรดเลือกเขตแทน')),{timeout:10000});return}mapAction(a)};
 render();loadData();
 let initialMapKey=window.FLOODAID_CONFIG?.googleMapsBrowserKey||'';try{initialMapKey=localStorage.getItem('fa-google-off')||sessionStorage.getItem('fa-google-off')?'':sessionStorage.getItem('fa-google-key')||localStorage.getItem('fa-google-key')||initialMapKey}catch{}
+window.activeGoogleMapKey=initialMapKey;
 if(initialMapKey)enableGoogleMap(initialMapKey).then(()=>render()).catch(()=>toast(t('Google Maps unavailable; using OpenStreetMap.','Google Maps ไม่พร้อม ใช้ OpenStreetMap แทน')));
