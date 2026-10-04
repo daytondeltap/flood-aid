@@ -95,3 +95,5 @@ City lookup uses Open-Meteo geocoding; optional coordinates/preferences remain o
 No API key is required for the global feed or OpenStreetMap. Google Maps remains optional and uses the existing single browser-key setting.
 
 GDACS RSS is read in hourly builds and refreshed in the browser from the same-origin snapshot to avoid its browser access restrictions. It adds flood, volcano and drought reports; cards label publication times separately from source-reported event periods. Its feed is a selection of events, not a complete 90-day archive. Source alert colors in titles describe humanitarian impact categories, not road clearance or personal safety.
+
+Custom listboxes replace native selection controls throughout both views, with keyboard navigation and disabled options. Startup requests browser geolocation (permission required), then filters recent reports within 500 km. Declining disables repeat startup prompts; city selection remains available. The nearby summary identifies source-reported events, not a detected personal hazard. GPS does not infer a country.

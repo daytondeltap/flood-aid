@@ -61,3 +61,11 @@ test('international flow supports location, proximity, event detail and all prim
  document.querySelector('[data-global-view="supplies"]').onclick();assert.equal(document.querySelector('#inventoryPanel'),null);document.querySelector('[data-place-search="Pharmacy"]').onclick();assert.match(dialog.querySelector('a').href,/Pharmacy/);dialog.close();
  run("globalLocation=null;globalRadius='all';globalView='feed';render()");assert.equal(document.querySelector('#disasterRadius option[value="100"]').hasAttribute('disabled'),true);
 });
+test('custom controls and automatic location identify nearby reports and respect denied permission',()=>{
+ let success,failure,calls=0;sandbox.Event=window.Event;sandbox.navigator.geolocation={getCurrentPosition(a,b){calls++;success=a;failure=b}};
+ run("globalMode=true;globalView='feed';globalLocation=null;globalSources=[{name:'USGS',state:'ready',checkedAt:Date.now(),rows:[{id:'near',type:'earthquake',title:'Nearby test earthquake',lat:35,lng:139,at:Date.now(),source:'USGS',url:'https://earthquake.usgs.gov/event',magnitude:4,depthKm:10,closed:null}]}];globalLoading=false;render()");
+ vm.runInContext(fs.readFileSync('web/polish.js','utf8'),sandbox,{filename:'polish.js'});assert.equal(calls,1);assert.match(document.querySelector('.nearby-summary').textContent,/Finding your location/);assert.ok(document.querySelector('#disasterType').classList.contains('native-picker'));assert.equal(document.querySelectorAll('.picker-trigger').length,4);
+ success({coords:{latitude:35,longitude:139}});assert.equal(run('globalRadius'),'500');assert.equal(run('globalDays'),7);assert.match(document.querySelector('.nearby-summary').textContent,/Nearby test earthquake/);assert.match(document.querySelector('#disasterRadius').closest('.custom-picker').textContent,/Within 500 km/);
+ run('globalLocation=null;requestAutomaticLocation(true)');failure({code:1});assert.match(document.querySelector('.nearby-summary').textContent,/Location access is off/);const before=calls;run('requestAutomaticLocation()');assert.equal(calls,before);assert.equal(run("read('fa-auto-location',true)"),false);
+ run("setGlobalLocation({lat:48.85,lng:2.35,label:'Paris',country:'FR'})");assert.equal(run("read('fa-auto-location',true)"),false);assert.ok(document.querySelector('#globalLocationButton'));
+});
