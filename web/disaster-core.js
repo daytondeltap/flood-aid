@@ -1,0 +1,12 @@
+'use strict';
+// Source-independent global coordinates: the Bangkok road validator remains local.
+(function(root){
+ const valid=p=>p&&Number.isFinite(p.lat)&&Number.isFinite(p.lng)&&Math.abs(p.lat)<=90&&Math.abs(p.lng)<=180;
+ const km=(a,b)=>{if(!valid(a)||!valid(b))return null;const r=Math.PI/180,dlat=(b.lat-a.lat)*r,dlng=(b.lng-a.lng)*r,x=Math.sin(dlat/2)**2+Math.cos(a.lat*r)*Math.cos(b.lat*r)*Math.sin(dlng/2)**2;return 6371*2*Math.asin(Math.sqrt(Math.min(1,x)))};
+ const link=u=>{try{const x=new URL(u);return x.protocol==='https:'&&!x.username&&!x.password?x.href:null}catch{return null}};
+ const categories={wildfires:'wildfire',severeStorms:'storm',floods:'flood',volcanoes:'volcano',landslides:'landslide',drought:'drought',snow:'winter',tempExtremes:'temperature'};
+ function usgs(data){return (data.features||[]).flatMap(f=>{const p=f.properties||{},c=f.geometry?.coordinates||[],point={lng:c[0],lat:c[1]};if(!valid(point)||!Number.isFinite(p.time)||!link(p.url))return [];return [{id:'usgs:'+f.id,type:'earthquake',title:p.title||p.place||'Earthquake',...point,at:p.time,closed:null,source:'USGS',url:link(p.url),magnitude:Number.isFinite(p.mag)?p.mag:null,depthKm:Number.isFinite(c[2])?c[2]:null}]})}
+ function eonet(data){return (data.events||[]).flatMap(e=>{const type=categories[e.categories?.[0]?.id];if(!type)return [];const g=(e.geometry||[]).filter(g=>g.type==='Point'&&valid({lng:g.coordinates?.[0],lat:g.coordinates?.[1]})&&Number.isFinite(Date.parse(g.date))).sort((a,b)=>Date.parse(b.date)-Date.parse(a.date))[0];if(!g)return [];return [{id:'eonet:'+e.id,type,title:e.title||type,lng:g.coordinates[0],lat:g.coordinates[1],at:Date.parse(g.date),closed:e.closed?Date.parse(e.closed):null,source:'NASA EONET',url:link(e.sources?.find(s=>link(s.url))?.url)||link(e.link),magnitude:null,depthKm:null}]})}
+ function select(rows,{type='all',days=30,origin=null,radius=null,sort='recent',now=Date.now()}={}){return rows.filter(e=>valid(e)&&Number.isFinite(e.at)&&e.at<=now+86400000&&e.at>=now-days*86400000&&(type==='all'||e.type===type)).map(e=>({...e,distance:km(origin,e)})).filter(e=>radius===null||(e.distance!==null&&e.distance<=radius)).sort((a,b)=>sort==='nearby'&&origin?a.distance-b.distance||b.at-a.at:b.at-a.at)}
+ root.DisasterCore={valid,km,link,usgs,eonet,select};
+})(typeof window==='undefined'?globalThis:window);

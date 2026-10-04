@@ -39,6 +39,8 @@ jobs:
           restore-keys: floodaid-observations-
       - name: Refresh public source data
         run: npm run data:refresh
+      - name: Refresh worldwide disaster reports
+        run: node scripts/refresh-disasters.mjs
       - name: Refresh connected retailer inventory
         run: python scripts/refresh-inventory.py
         env:

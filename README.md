@@ -86,3 +86,10 @@ The compact interface removes manual metadata tools, repeated explainers, discon
 Stock previews rotate across water, food, hygiene, sanitary products, diapers, batteries, masks and cleaning supplies. The public reader checks essential categories on retailer pages; a mixed 12-item preview keeps one category from hiding the others. Search still finds individual products. Availability and exact branch counts retain the same evidence requirements.
 
 Stock cards open a confirmation dialog before navigating to the official product page. KFC and McDonald's menus are read automatically; menu listings do not establish local branch inventory or delivery availability. McDonald's uses its published product ordering links; KFC uses its menu with the item anchor because product cards share the menu URL.
+
+## International disaster view
+DisasterAid opens on a global feed. USGS supplies M2.5+ earthquake observations for the last 30 days; NASA EONET supplies selected natural events for 90 days (open and ended). Point geometries only; coverage is incomplete. Hourly Pages builds refresh both feeds. Refresh in the UI requests the feeds directly and preserves prior reports and source fetch timestamps on failure. Event times use device local time; NASA times can represent a date rather than an exact time. Distance is great-circle distance to a reported point, not an impact area or risk estimate.
+
+City lookup uses Open-Meteo geocoding; optional coordinates/preferences remain on the device. Routes and worldwide store searches open Google Maps after a confirmation. Routes do not avoid disasters. Product availability remains Thailand-only. Existing Bangkok depth, heatmaps, history and route evidence are available as explicitly local features. Emergency call shortcuts are currently verified for Thailand, US and EU; other countries use local services and global official-information links. GPS coordinates alone do not identify a country.
+
+No API key is required for the global feed or OpenStreetMap. Google Maps remains optional and uses the existing single browser-key setting.
